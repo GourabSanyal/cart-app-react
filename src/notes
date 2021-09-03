@@ -1,0 +1,142 @@
+1. "Cart" is a state value, using "useState"
+2. "Data.js" is just array of items.
+3. "useReducer" is looking for the "reducer" function which we have got from reducer.js
+    and also an innitial state
+4.  In Context.js in "innitialState" pass the values of loading,cart, total and amount
+5. Pass in reducer in "AppProvider" a a first argument
+6. in Navbar.js, as"Navbar" is looking for amount of items in the cart, pass in "amount" as a function
+7. in App.js, set "loading" function, in context.js, set "loading: true"
+8. In "CartContainer" I also wanna get the total amount, so pass "total" along with cart in the main component
+
+                                        /* CLAR WHOLE CART */
+
+9. Setup "clearCart" in context js, pass it in the <AppProvider /> fragment.
+10. In CartContainer.js, pass "clearCart" along with cart and total
+  
+                    const clearCart = () => {
+                        dispatch({ type: 'CLEAR_CART' })
+                     }  
+
+11. This will be handeled by the reducer.js, set up "clearCart" in reducer.js
+12. If the action taken is "CLEAR_CART" then return the state and set cart to an empty array
+        
+            const reducer = (state, action) => {
+                if (action.type === 'CLEAR_CART') {
+                    return { ...state, cart: [] }
+                }
+                return state
+            }
+
+                                        /* CLEAR SINGLE ITEM */
+
+13. in Context.js make "remove" function with a dispatch, with "payload: id"
+    so that it denotes each individual id
+        
+                const remove = (id) => {
+                dispatch({ type: 'REMOVE', payload: id })
+            }
+
+14. In CartItems.js where the buttons are, pass in an onClick button for handeling the "remove" function
+        
+                    {/* remove button */}
+                    <button
+                    className='remove-btn'
+                    onClick={() => remove(id)}
+                    >
+                    remove
+                    </button>`
+
+15. In reducer.js make a logic to handle the remove function
+        
+            if (action.type === 'REMOVE') {
+                    return {
+                        ...state,
+                        cart: state.cart.filter((cartItem) =>
+                            cartItem.id !== action.payload)
+                    }
+                }
+
+        returning a state first, then cart.
+        Filter the state of the cart and grab the values of the items who's IDs doesnt match
+        I'm passing the payload the "id" of the Item I wanna remove, the we will add
+                "(cartItem) =>" 
+        Which is every item in the array.
+                "cartItem.id !== action.payload)"
+        this means if the "cart.item.id" does not match the ID i'm passing in the "payload"
+        then the "item" will be return "action.payload"
+
+                          
+                                        /* INCREASE ITEM */
+
+16. Make a separate variabe "tempCart" for handling the increase,
+
+            let tempCart = []
+
+    also set a return: I want the state value, and change "cart" to "tempCart"
+    
+                return { ...state, cart: tempCart }
+
+17. Map the cart, and iterate over the cart using the callnback function before the update,
+    call it "cartItem" which will denote each item in the cart
+
+        state.map.cart((cartItem)) => {}
+
+18. Now I want to check while itereting over it that if the item ID matches the ID I am passing in then I want to increase the amount property in that Item.
+
+        if(cart.item.id === action.payload){
+
+        } return cartItem
+
+    if ID of a cart Item changes and equals to the "action" taken with "payload" then I would like to change the "item"
+    if not then I want a "return" the "cartItem" the way it is
+
+19. If the "id" matches then I will return a new Item and copy all the items from "cartItem",
+     however only "amount" is something I wanna change.
+     
+                            return { ...cartItem, amount: cartItem.amount + 1 }
+
+            amount will be current amount of "cartItem" and then "+1"
+
+        #Final code for Increase:
+
+                if (action.type === 'INCREASE') {
+                    let tempCart = state.cart.map((cartItem) => {
+                        if (cartItem.id === action.payload) {
+                            return { ...cartItem, amount: cartItem.amount + 1 }
+                        }
+                        return cartItem
+                    })
+                    return { ...state, cart: tempCart }
+                }
+
+                                        /* DECREASE ITEM /
+
+20. When I am decreasing I want to delete the item when it goes below 1.
+    this code will be written after "return cartItem"
+
+                filter((cartItem) => cartItem.amunt !== 0)
+
+        filter the cart Items and if the amount of the cart Item is not equal to zero, then
+
+                return { ...state, cart: tempCart }
+
+
+            
+                                        /* VALUES OF TOTAL AND AMOUNT */
+
+
+21. in Context.js, We have to set up a "useEffect" function for changing the state value insid e the cart.
+22. Check when you are updating the value if the useEffect is been called or not 
+            useEffect(() => {
+                console.log('YEYE')
+            }, [state.cart])
+    
+23. We have to dispatch an action to get total.
+            useEffect(() => {
+                dispatch({ type: 'GET_TOTAL' })
+            }, [state.cart])
+
+24. In "Reducer.js" set up a separate variable top handle this function
+25. Reeturn all of state, just change the 'total' , and the 'aount'
+26. Use the "useReducer" which will return a object
+27. 
